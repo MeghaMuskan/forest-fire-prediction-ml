@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Fire Risk Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">FWI<span>·</span>Predictor</div>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#model">Model</a></li>
+            <li><a href="https://github.com/MeghaMuskan" target="_blank">GitHub</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+        <div class="glass-card">
+
+            <div class="hero">
+                <span class="eyebrow">Algerian Forest Fires Dataset · Ridge Regression</span>
+                <h1>Fire Weather Index Prediction</h1>
+                <p class="subtitle">
+                    Estimate wildfire risk from real-time meteorological readings using a
+                    Ridge regression model trained on temperature, humidity, wind, and fuel-moisture data.
+                </p>
+            </div>
+
+            <div class="panel">
+                <div class="panel-label">Input Parameters</div>
+
+                <form action="{{ url_for('predict_datapoint') }}" method="POST">
+
+                    <div class="row">
+                        <div class="input-group">
+                            <label>Temperature <span class="unit">°C</span></label>
+                            <input type="number" step="any" name="Temperature" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Relative Humidity <span class="unit">%</span></label>
+                            <input type="number" step="any" name="RH" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-group">
+                            <label>Wind Speed <span class="unit">km/h</span></label>
+                            <input type="number" step="any" name="Ws" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Rain <span class="unit">mm</span></label>
+                            <input type="number" step="any" name="Rain" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-group">
+                            <label>FFMC <span class="unit">index</span></label>
+                            <input type="number" step="any" name="FFMC" required>
+                        </div>
+                        <div class="input-group">
+                            <label>DMC <span class="unit">index</span></label>
+                            <input type="number" step="any" name="DMC" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="input-group">
+                            <label>ISI <span class="unit">index</span></label>
+                            <input type="number" step="any" name="ISI" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Classes <span class="unit">code</span></label>
+                            <input type="number" step="any" name="Classes" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label>Region <span class="unit">code</span></label>
+                        <input type="number" step="any" name="Region" required>
+                    </div>
+
+                    <button type="submit">Run Prediction</button>
+                </form>
+
+                {% if result is not none %}
+                <div class="prediction">
+                    <div class="prediction-label">Output — Fire Weather Index</div>
+
+                    <div class="readout">
+                        <span class="value">{{ result }}</span>
+                        <span class="unit-label">FWI score</span>
+                    </div>
+
+                    <span class="status-tag status-{{ color }}">{{ status }}</span>
+
+                    <div class="gauge">
+                        <div class="gauge-fill status-{{ color }}" style="width: {{ gauge_pct }}%; background: currentColor;"></div>
+                    </div>
+                    <div class="gauge-scale">
+                        <span>0 — Low</span>
+                        <span>15 — Moderate</span>
+                        <span>30+ — High</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="info-card" id="about">
+                    <h2>What is the Fire Weather Index?</h2>
+                    <p>
+                        The Fire Weather Index (FWI) is an internationally recognized numerical
+                        rating used to estimate wildfire danger. It synthesizes temperature,
+                        relative humidity, wind speed, and rainfall — along with fuel-moisture
+                        codes (FFMC, DMC) and spread-rate indicators (ISI) — into a single score
+                        representing potential fire intensity.
+                    </p>
+                </div>
+
+                <div class="model-card" id="model">
+                    <h2>Model Details</h2>
+                    <dl>
+                        <div>
+                            <div class="term">Model</div>
+                            <div class="desc">Ridge Regression</div>
+                        </div>
+                        <div>
+                            <div class="term">Dataset</div>
+                            <div class="desc">Algerian Forest Fires (244 records)</div>
+                        </div>
+                        <div>
+                            <div class="term">Preprocessing</div>
+                            <div class="desc">StandardScaler normalization</div>
+                        </div>
+                        <div>
+                            <div class="term">Features</div>
+                            <div class="desc">Temperature, RH, Ws, Rain, FFMC, DMC, ISI, Classes, Region</div>
+                        </div>
+                        <div>
+                            <div class="term">Framework</div>
+                            <div class="desc">Flask · scikit-learn</div>
+                        </div>
+                        <div>
+                            <div class="term">Deployment</div>
+                            <div class="desc">REST API, JSON/form inference endpoint</div>
+                        </div>
+                    </dl>
+                </div>
+
+            </div>
+
+            <footer>
+                <div class="name">Megha Muskan</div>
+                <div class="stack">Python · Flask · Scikit-learn · Ridge Regression</div>
+            </footer>
+
+        </div>
+    </div>
+
+</body>
+</html>

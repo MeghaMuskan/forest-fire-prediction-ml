@@ -1,7 +1,6 @@
 import sys
 import os
 import pytest
-import numpy as np
 
 # Make sure the project root (where application.py lives) is importable
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -25,25 +24,19 @@ def client(app):
 @pytest.fixture
 def mock_model(monkeypatch):
     """
-    Replaces the loaded ridge_model and standard_scaler with deterministic
-    stand-ins so tests don't depend on the actual trained model's output —
-    we're testing the Flask routing/logic, not the ML model itself.
+    Replaces the app's model_service.predict() with a deterministic stand-in
+    so tests don't depend on the actual trained model's output — we're
+    testing the Flask routing/classification logic, not the ML model itself.
     """
-    class FakeScaler:
-        def transform(self, data):
-            # Pass the input straight through unscaled
-            return np.array(data)
+    class FakeModelService:
+        def predict(self, features):
+            return self.fixed_value
 
-    class FakeModel:
-        def __init__(self, fixed_value):
-            self.fixed_value = fixed_value
-
-        def predict(self, data):
-            return np.array([self.fixed_value])
+    fake_service = FakeModelService()
 
     def _set_prediction(value):
-        monkeypatch.setattr(app_module, "standard_scaler", FakeScaler())
-        monkeypatch.setattr(app_module, "ridge_model", FakeModel(value))
+        fake_service.fixed_value = value
+        monkeypatch.setattr(app_module, "model_service", fake_service)
 
     return _set_prediction
 

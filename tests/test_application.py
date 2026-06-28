@@ -5,6 +5,57 @@ Run with:  pytest tests/ -v
 """
 import pytest
 from conftest import VALID_FORM_DATA
+import application as app_module
+from application import InputValidator, RiskClassifier
+
+
+# ---------------------------------------------------------------------------
+# Unit tests for the OOP domain classes (independent of Flask routing)
+# ---------------------------------------------------------------------------
+
+class TestInputValidator:
+
+    def test_extract_returns_correct_field_order(self):
+        form = {
+            "Temperature": "30", "RH": "50", "Ws": "10", "Rain": "0",
+            "FFMC": "80", "DMC": "15", "ISI": "5", "Classes": "1", "Region": "1",
+        }
+        result = InputValidator.extract(form)
+        assert result == [30.0, 50.0, 10.0, 0.0, 80.0, 15.0, 5.0, 1.0, 1.0]
+
+    def test_extract_defaults_missing_fields_to_zero(self):
+        result = InputValidator.extract({"Temperature": "30"})
+        assert result == [30.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    def test_extract_raises_on_invalid_input(self):
+        with pytest.raises(ValueError):
+            InputValidator.extract({"Temperature": "not-a-number"})
+
+
+class TestRiskClassifierUnit:
+
+    @pytest.fixture
+    def classifier(self):
+        return RiskClassifier()
+
+    def test_classify_low(self, classifier):
+        result = classifier.classify(2.5)
+        assert result["status"] == "Low Fire Risk"
+        assert result["color"] == "low"
+
+    def test_classify_moderate(self, classifier):
+        result = classifier.classify(10)
+        assert result["status"] == "Moderate Fire Risk"
+        assert result["color"] == "moderate"
+
+    def test_classify_high(self, classifier):
+        result = classifier.classify(20)
+        assert result["status"] == "High Fire Risk"
+        assert result["color"] == "high"
+
+    def test_classify_gauge_pct_matches_app_level_test(self, classifier):
+        result = classifier.classify(15)
+        assert result["gauge_pct"] == 50.0
 
 
 # ---------------------------------------------------------------------------

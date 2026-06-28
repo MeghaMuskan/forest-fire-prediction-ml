@@ -19,7 +19,7 @@ A machine learning project that predicts forest fire risk using regression model
 ---
 
 ## ⚙️ Technologies Used
-- Python
+- Python (object-oriented architecture)
 - Pandas, NumPy
 - Matplotlib, Seaborn
 - Scikit-learn
@@ -49,8 +49,9 @@ A machine learning project that predicts forest fire risk using regression model
 5. Hyperparameter Tuning (RidgeCV, LassoCV)
 6. Model Evaluation and Comparison
 7. REST API Development (Flask)
-8. Unit Testing (pytest)
-9. Deployment (Azure App Service)
+8. Object-Oriented Refactor (InputValidator, ModelService, RiskClassifier)
+9. Unit Testing (pytest)
+10. Deployment (Azure App Service)
 
 ---
 
@@ -62,13 +63,25 @@ A machine learning project that predicts forest fire risk using regression model
 
 ---
 
+## 🏗️ Architecture
+
+The Flask backend is structured around three single-responsibility classes rather than loose procedural code:
+- **`InputValidator`** — extracts and validates incoming form data
+- **`ModelService`** — owns the trained Ridge model and scaler, handles inference
+- **`RiskClassifier`** — converts a raw FWI score into a risk category, color, and gauge percentage
+
+The route handler orchestrates these three classes rather than containing the logic itself.
+
+---
+
 ## 🧪 Testing
 
-The Flask app is covered by a 21-case pytest suite, including:
+The Flask app is covered by a 28-case pytest suite, including:
 - Route availability and method handling
 - Exact risk-category boundary behavior (e.g. a score of 4.99 vs. 5.0)
 - Gauge percentage scaling and overflow capping
 - Missing-field and invalid-input handling
+- Unit tests for each domain class (`InputValidator`, `RiskClassifier`) independent of Flask routing
 
 Run locally:
 ```bash
@@ -97,7 +110,7 @@ forest-fire-prediction-ml/
 │
 ├── tests/
 │   ├── conftest.py                          # Test fixtures and mocked model
-│   └── test_application.py                  # 21-case pytest suite
+│   └── test_application.py                  # 28-case pytest suite
 │
 ├── csv_files/                               # Raw and cleaned datasets
 │
@@ -139,8 +152,9 @@ To analyze environmental data and build predictive models that can help in under
 
 ## 🚀 Future Improvements
 - ~~Deployment as a web application~~ ✅ Done — live on Azure
-- ~~Unit testing~~ ✅ Done — 21-case pytest suite
+- ~~Unit testing~~ ✅ Done — 28-case pytest suite
 - ~~Hyperparameter tuning~~ ✅ Done — RidgeCV/LassoCV used to select optimal alpha
+- ~~Object-oriented refactor~~ ✅ Done — InputValidator, ModelService, RiskClassifier
 - CI/CD pipeline for automated testing on push
 - Model optimization with additional environmental features
 - Use of advanced ML models (e.g. gradient boosting)
